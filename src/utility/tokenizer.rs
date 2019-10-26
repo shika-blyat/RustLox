@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt;
 
+#[derive(Debug)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen{line: u16, nbr_char: u8},
@@ -65,15 +66,31 @@ impl fmt::Display for InvalidToken {
 
 impl Error for InvalidToken {}
 
-pub fn tokenize<T>(program: &str)-> Result<Vec<TokenType>, Vec<InvalidToken>>  {
-    let mut start = 0;
-    let mut current = 0;
+pub fn tokenize(program: &str)-> Result<Vec<TokenType>, Vec<InvalidToken>>  {
+
     let mut line = 1;
     let mut nbr_char = 0;
     let mut token_list = vec![];
     let mut errors = vec![];
-    for i in program.chars(){
-        current+=1;
+    let mut lookahead = false;
+    let mut looked_char = '0'; // Don't blame me for this name :(
+
+    fn look_to(looked: char){
+        |mut looked_char| looked_char = looked;
+        |mut lookahead| lookahead = true;
+    }
+
+    for (k,i) in program.chars().enumerate(){
+        nbr_char+=1;
+        if let '\n' = i{
+            line += 1 ;
+            nbr_char = 0;
+            lookahead = false;
+        }
+        if lookahead && i == looked_char {
+            lookahead = false;
+        }
+        if !lookahead{
         match i{
             '(' => token_list.push(TokenType::LeftParen{line, nbr_char}),
             ')' => token_list.push(TokenType::RightParen{line, nbr_char}),
@@ -85,8 +102,33 @@ pub fn tokenize<T>(program: &str)-> Result<Vec<TokenType>, Vec<InvalidToken>>  {
             '+' => token_list.push(TokenType::Plus{line, nbr_char}),
             '-' => token_list.push(TokenType::Minus{line, nbr_char}),
             '*' => token_list.push(TokenType::Star{line, nbr_char}),
+            '=' => match program.chars().nth(k+1) {
+                    Some('=') => token_list.push(TokenType::EqualEqual{line, nbr_char}),
+                    _ => token_list.push(TokenType::Equal{line, nbr_char}),
+                },
+            '>' => match program.chars().nth(k+1) {
+                    Some('=') => token_list.push(TokenType::GreaterEqual{line, nbr_char}),
+                    _ => token_list.push(TokenType::Greater{line, nbr_char}),
+                },
+            '<' => match program.chars().nth(k+1) {
+                    Some('=') => token_list.push(TokenType::LessEqual{line, nbr_char}),
+                    _ => token_list.push(TokenType::Less{line, nbr_char}),
+                },
+            '!' => match program.chars().nth(k+1) {
+                    Some('=') => token_list.push(TokenType::BangEqual{line, nbr_char}),
+                    _ => token_list.push(TokenType::Bang{line, nbr_char})
+                },
+            '/' => match program.chars().nth(k+1) {
+                    Some('/') => look_to('/'),
+                    _ => token_list.push(TokenType::Slash{line, nbr_char})
+                },
+            ' ' => (),
+            '\n' => (),
+            '\r' => (),
+            '\t' => (),
             _   => errors.push(InvalidToken{line, nbr_char, token: i}),
         };
+        }
     }
     token_list.push(TokenType::Eof{line, nbr_char: program.len() as u8});
     if errors.len() == 0 {Ok(token_list)} else {Err(errors)}
