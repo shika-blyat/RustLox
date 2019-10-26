@@ -8,9 +8,10 @@ use std::io::Error;
 use std::io::Read;
 use std::io::Write;
 
-use utility::tokenizer::tokenize;
+use utility::tokenizer::TokenList;
 
 fn main() {
+
     run_interpreter();
 }
 fn run_interpreter() {
@@ -37,6 +38,8 @@ fn execute_line(line: &str) -> bool {
     if line.to_lowercase() == "quit()" {
         return false;
     }
+    let mut program = TokenList::new(line);
+    println!("{:?}", program.tokenize());
     true
 }
 
