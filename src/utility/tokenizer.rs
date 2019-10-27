@@ -77,8 +77,16 @@ impl TokenList{
         let mut last_char = '\0';
         let mut lookahead = false;
         let mut looked_char = '\0';
-        let mut looked_token: TokenType = TokenType::Eof;
+        let mut looked_token: TokenType = TokenType::Eof; // default value
         for (_k,i) in self.program.chars().enumerate(){
+
+            if i == '\n'{
+                println!("n");
+                lookahead = false;
+                self.line+=1;
+                self.nbr_char=0;
+                continue;
+            }
             if lookahead{
                 if i == looked_char{
                     lookahead = false;
@@ -99,27 +107,48 @@ impl TokenList{
                 '*' => self.token_list.push(Token{token_type: TokenType::Star, line: self.line, nbr_char: self.nbr_char}),
                 '=' => if last_char == '=' {
                             self.token_list.pop();
-                            self.token_list.push(Token{token_type: TokenType::EqualEqual, line: self.line, nbr_char: self.nbr_char})
+                            self.nbr_char-=1;
+                            self.token_list.push(Token{token_type: TokenType::EqualEqual,
+                                line: self.line, nbr_char: self.nbr_char})
                         } else if last_char == '<' {
+                            self.nbr_char-=1;
                             self.token_list.pop();
-                            self.token_list.push(Token{token_type: TokenType::LessEqual, line: self.line, nbr_char: self.nbr_char})
+                            self.token_list.push(Token{token_type: TokenType::LessEqual, 
+                                line: self.line, nbr_char: self.nbr_char})
                         } else if last_char == '>' {
+                            self.nbr_char-=1;
                             self.token_list.pop();
-                            self.token_list.push(Token{token_type: TokenType::GreaterEqual, line: self.line, nbr_char: self.nbr_char})
+                            self.token_list.push(Token{token_type: TokenType::GreaterEqual, 
+                                line: self.line, nbr_char: self.nbr_char})
                         } else if last_char == '!' {
+                            self.nbr_char-=1;
                             self.token_list.pop();
-                            self.token_list.push(Token{token_type: TokenType::BangEqual, line: self.line, nbr_char: self.nbr_char})
+                            self.token_list.push(Token{token_type: TokenType::BangEqual, 
+                                line: self.line, nbr_char: self.nbr_char})
                         } else {
-                            self.token_list.push(Token{token_type: TokenType::Equal, line: self.line, nbr_char: self.nbr_char})
+                            self.token_list.push(Token{token_type: TokenType::Equal, 
+                                line: self.line, nbr_char: self.nbr_char})
                         },
                 '<' => self.token_list.push(Token{token_type: TokenType::Less, line: self.line, nbr_char: self.nbr_char}),
                 '>' => self.token_list.push(Token{token_type: TokenType::Greater, line: self.line, nbr_char: self.nbr_char}),
                 '!' => self.token_list.push(Token{token_type: TokenType::Bang, line: self.line, nbr_char: self.nbr_char}),
+                '/' => if last_char == '/' {
+                            self.token_list.pop();
+                            lookahead = true;
+                        } else{
+                            self.token_list.push(Token{token_type: TokenType::Slash, line: self.line, nbr_char: self.nbr_char})
+                        }
+                '"' => if last_char == '/' {
+                            self.token_list.pop();
+                            lookahead = true;
+                        }
+                '\n'|'\t'|'\r'|' ' => (),
                 _ => self.token_list.push(Token{token_type: TokenType::InvalidToken, line: self.line, nbr_char: self.nbr_char}),
             }
             last_char = i;
+            self.nbr_char+=1;
         }
-        self.token_list.push(Token{token_type: TokenType::Eof, line:self.program.len(), nbr_char:self.nbr_char});
+        self.token_list.push(Token{token_type: TokenType::Eof, line: self.line, nbr_char:self.nbr_char});
         &self.token_list
     }
 }
