@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Token{
@@ -5,7 +7,7 @@ pub struct Token{
     line: usize,
     nbr_char: usize,
 }
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 #[allow(dead_code)]
 pub enum TokenType {
     // Single-character tokens.
@@ -32,9 +34,9 @@ pub enum TokenType {
     LessEqual,
 
     // Literals.
-    Identifier,
-    String,
-    Number,
+    Identifier(String),
+    String(String),
+    Number(f64),
 
     // Keywords.
     And,
@@ -59,7 +61,18 @@ pub enum TokenType {
     InvalidToken,
 }
 
-
+trait Slicing{
+    fn sliced(&self, range: std::ops::Range<usize>) -> String;
+}
+impl Slicing for String{
+    fn sliced(&self, range: std::ops::Range<usize>) -> String{
+        let mut new_str = String::new();
+        for i in range{
+            new_str.push(self.chars().nth(i).unwrap());
+        }
+        new_str
+    }
+}
 pub struct TokenList{
     pub program : String,
     pub token_list: Vec<Token>,
@@ -77,8 +90,8 @@ impl TokenList{
         let mut last_char = '\0';
         let mut lookahead = false;
         let mut looked_char = '\0';
-        let mut looked_token: TokenType = TokenType::Eof; // default value
-        for (_k,i) in self.program.chars().enumerate(){
+        let mut looked_index = 0;
+        for (k,i) in self.program.chars().enumerate(){
 
             if i == '\n'{
                 println!("n");
@@ -90,7 +103,13 @@ impl TokenList{
             if lookahead{
                 if i == looked_char{
                     lookahead = false;
-                    self.token_list.push(Token{token_type: TokenType::LeftParen, line: self.line, nbr_char: self.nbr_char})
+                    if looked_char == '"'{
+                        self.token_list.pop();
+                        self.token_list.push(Token{token_type: TokenType::String(String::from(
+                            &self.program.sliced(Range{start: looked_index, end: k,}))),
+                            line: self.line, nbr_char: self.nbr_char});
+                    }
+                    
                 }
                 continue;
             }
@@ -138,9 +157,11 @@ impl TokenList{
                         } else{
                             self.token_list.push(Token{token_type: TokenType::Slash, line: self.line, nbr_char: self.nbr_char})
                         }
-                '"' => if last_char == '/' {
+                '"' => {
                             self.token_list.pop();
                             lookahead = true;
+                            looked_char = '"';
+                            looked_index = k;
                         }
                 '\n'|'\t'|'\r'|' ' => (),
                 _ => self.token_list.push(Token{token_type: TokenType::InvalidToken, line: self.line, nbr_char: self.nbr_char}),
