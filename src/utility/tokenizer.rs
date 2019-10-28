@@ -1,78 +1,13 @@
-use std::ops::Range;
-
+use crate::utility::tokens::TokenType;
 #[derive(Debug)]
 #[allow(dead_code)]
+
 pub struct Token {
     token_type: TokenType,
     line: usize,
     nbr_char: usize,
 }
-#[derive(Debug, Clone)]
-#[allow(dead_code)]
-pub enum TokenType {
-    // Single-character tokens.
-    LeftParen,
-    RightParen,
-    LeftBrace,
-    RightBrace,
-    Comma,
-    Dot,
-    Minus,
-    Plus,
-    Semicolon,
-    Slash,
-    Star,
 
-    // One or two character tokens.
-    Bang,
-    BangEqual,
-    Equal,
-    EqualEqual,
-    Greater,
-    GreaterEqual,
-    Less,
-    LessEqual,
-
-    // Literals.
-    Identifier(String),
-    String(String),
-    Number(f64),
-
-    // Keywords.
-    And,
-    Class,
-    Else,
-    False,
-    Fun,
-    For,
-    If,
-    Nil,
-    Or,
-    Print,
-    Return,
-    Super,
-    This,
-    True,
-    Var,
-    While,
-    Eof,
-
-    //Error
-    InvalidToken,
-}
-
-trait Slicing {
-    fn sliced(&self, range: std::ops::Range<usize>) -> String;
-}
-impl Slicing for String {
-    fn sliced(&self, range: std::ops::Range<usize>) -> String {
-        let mut new_str = String::new();
-        for i in range {
-            new_str.push(self.chars().nth(i).unwrap());
-        }
-        new_str
-    }
-}
 pub struct TokenList {
     pub program: String,
     pub token_list: Vec<Token>,
@@ -89,11 +24,13 @@ impl TokenList {
             nbr_char: 1,
         }
     }
+
     pub fn tokenize(&mut self) -> &Vec<Token> {
         let mut last_char = '\0';
         let mut lookahead = false;
         let mut looked_char = '\0';
         let mut looked_index = 0;
+
         for (k, i) in self.program.chars().enumerate() {
             if i == '\n' {
                 lookahead = false;
@@ -101,7 +38,8 @@ impl TokenList {
                 self.nbr_char = 0;
                 continue;
             }
-            if i.is_digit(10) || i == '.'{                
+            println!("last_char:{}, i: {} ", last_char,i);
+            if i.is_digit(10) || i == '.'{
                 if last_char.is_digit(10) || last_char == '.' {
                     self.nbr_char += 1;
                 } else {
@@ -109,8 +47,7 @@ impl TokenList {
                 }
                 last_char = i;
                 continue;
-            } else if last_char.is_digit(10) {
-                last_char = i;
+            }  else if last_char.is_digit(10) {
                 self.token_list.push(Token {
                     token_type: TokenType::Number(self.program[looked_index..k].parse::<f64>().unwrap()),
                     line: self.line,
@@ -118,17 +55,12 @@ impl TokenList {
                 });
             } 
             if lookahead {
+                last_char = i;
                 if i == looked_char {
                     lookahead = false;
                     if looked_char == '"' {
-                        self.token_list.pop();
                         self.token_list.push(Token {
-                            token_type: TokenType::String(String::from(&self.program.sliced(
-                                Range {
-                                    start: looked_index,
-                                    end: k,
-                                },
-                            ))),
+                            token_type: TokenType::String(String::from(&self.program[looked_index+1..k])),
                             line: self.line,
                             nbr_char: self.nbr_char,
                         });
@@ -256,7 +188,6 @@ impl TokenList {
                     }
                 }
                 '"' => {
-                    self.token_list.pop();
                     lookahead = true;
                     looked_char = '"';
                     looked_index = k;
