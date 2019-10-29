@@ -52,8 +52,12 @@ impl Scanner {
     }
     fn scan_token(&mut self) {
         let c = self.advance();
+
         if c.is_digit(10){
             self.get_number();
+            return
+        } else if c.is_ascii_alphabetic() || c == '_'{
+            self.get_identifier();
             return
         }
         match c {
@@ -109,6 +113,31 @@ impl Scanner {
             '\r' | '\t' | ' ' => (),
             '\n' => self.line+=1,
             _ => self.add_token(TokenType::InvalidToken),
+        }
+    }
+    fn get_identifier(&mut self){
+        while self.peek().is_ascii_alphanumeric(){
+            self.advance();
+        }
+        let name = self.source[self.start..self.current].to_string();
+        match name.as_str(){
+            "and" => self.add_token(TokenType::And),
+            "class" => self.add_token(TokenType::Class),
+            "else" => self.add_token(TokenType::Else),
+            "false" => self.add_token(TokenType::False),
+            "fun" => self.add_token(TokenType::Fun),
+            "for" => self.add_token(TokenType::For),
+            "if" => self.add_token(TokenType::If),
+            "nil" => self.add_token(TokenType::Nil),
+            "or" => self.add_token(TokenType::Or),
+            "print" => self.add_token(TokenType::Print),
+            "return" => self.add_token(TokenType::Return),
+            "super" => self.add_token(TokenType::Super),
+            "this" => self.add_token(TokenType::This),
+            "true" => self.add_token(TokenType::True),
+            "var" => self.add_token(TokenType::Var),
+            "while" => self.add_token(TokenType::While),
+            _ => self.add_token(TokenType::Identifier(name)),
         }
     }
     fn get_number(&mut self){
