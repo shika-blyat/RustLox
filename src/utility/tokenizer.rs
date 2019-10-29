@@ -102,8 +102,28 @@ impl Scanner {
                     self.add_token(TokenType::Slash);
                 }
             }
+            '"' => self.get_string(),
+            '\r' | '\t' | ' ' => (),
+            '\n' => self.line+=1,
             _ => self.add_token(TokenType::InvalidToken),
         }
+    }
+    fn get_string(&mut self){
+        println!("a");
+        while self.peek() != '"' && self.is_full(){
+            if self.peek() == '\n' {
+                self.line+=1;
+            }
+            self.advance();
+        }
+        if !self.is_full(){
+            self.add_token(TokenType::InvalidToken);
+            return
+        }
+        self.advance(); // The closing '"'
+        let value = self.source[self.start+1..self.current-1].to_string();
+        self.add_token(TokenType::String(value));
+        println!("c");
     }
     fn match_next_char(&mut self, c: char) -> bool {
         if !self.is_full() {
@@ -122,11 +142,16 @@ impl Scanner {
     }
     fn add_token(&mut self, token_type: TokenType) {
         let text = self.source[self.start..self.current].to_string();
-        if let TokenType::Eof = token_type {
-            self.tokens
-                .push(Token::new(token_type, String::new(), self.line));
-        } else {
-            self.tokens.push(Token::new(token_type, text, self.line));
+        match token_type{
+            TokenType::Eof => {
+                self.tokens
+                    .push(Token::new(token_type, String::new(), self.line));
+            },
+            TokenType::String(_) => {
+                let text = self.source[self.start+1..self.current-1].to_string();
+                self.tokens.push(Token::new(token_type, text, self.line));
+            },
+            _ => self.tokens.push(Token::new(token_type, text, self.line)),
         }
     }
     fn advance(&mut self) -> char {
