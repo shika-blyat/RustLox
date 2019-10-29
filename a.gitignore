@@ -1,2 +1,3 @@
-/target
-.lock
+/target/
+Cargo.lock
+/Old_files/
