@@ -53,7 +53,7 @@ impl Scanner {
     fn scan_token(&mut self) {
         let c = self.advance();
         println!("{}", c);
-        match c{
+        match c {
             '(' => self.add_token(TokenType::RightParen),
             ')' => self.add_token(TokenType::LeftParen),
             '{' => self.add_token(TokenType::RightBrace),
@@ -69,16 +69,15 @@ impl Scanner {
     }
     fn add_token(&mut self, token_type: TokenType) {
         let text = self.source[self.start..self.current].to_string();
-        if let TokenType::Eof = token_type{
+        if let TokenType::Eof = token_type {
             self.tokens
                 .push(Token::new(token_type, String::new(), self.line));
         } else {
-            self.tokens
-                .push(Token::new(token_type, text, self.line));
+            self.tokens.push(Token::new(token_type, text, self.line));
         }
     }
     fn advance(&mut self) -> char {
-        self.current+=1;
-        self.source.chars().nth(self.current-1).unwrap()
+        self.current += 1;
+        self.source.chars().nth(self.current - 1).unwrap()
     }
 }
