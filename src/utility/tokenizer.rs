@@ -98,9 +98,9 @@ impl Scanner {
                     {
                         self.advance();
                     }
-                } /*else {
+                } else {
                     self.add_token(TokenType::Slash);
-                }*/
+                }
             }
             _ => self.add_token(TokenType::InvalidToken),
         }
