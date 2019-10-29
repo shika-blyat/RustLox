@@ -54,18 +54,47 @@ impl Scanner {
         let c = self.advance();
         println!("{}", c);
         match c {
-            '(' => self.add_token(TokenType::RightParen),
-            ')' => self.add_token(TokenType::LeftParen),
-            '{' => self.add_token(TokenType::RightBrace),
-            '}' => self.add_token(TokenType::LeftBrace),
+            '(' => self.add_token(TokenType::LeftParen),
+            ')' => self.add_token(TokenType::RightParen),
+            '{' => self.add_token(TokenType::LeftBrace),
+            '}' => self.add_token(TokenType::RightBrace),
             '+' => self.add_token(TokenType::Plus),
             '-' => self.add_token(TokenType::Minus),
             '*' => self.add_token(TokenType::Star),
             ';' => self.add_token(TokenType::Semicolon),
             ',' => self.add_token(TokenType::Comma),
             '.' => self.add_token(TokenType::Dot),
-            _ => (),
+            '!' => if self.match_next_char('='){
+                    self.add_token(TokenType::BangEqual);
+                } else {
+                    self.add_token(TokenType::Bang);
+                }
+            '=' => if self.match_next_char('='){
+                    self.add_token(TokenType::EqualEqual);
+                } else {
+                    self.add_token(TokenType::Equal);
+                }
+            '<' => if self.match_next_char('='){
+                    self.add_token(TokenType::LessEqual);
+                } else {
+                    self.add_token(TokenType::Less);
+                }
+            '>' => if self.match_next_char('='){
+                    self.add_token(TokenType::GreaterEqual);
+                } else {
+                    self.add_token(TokenType::Greater);
+                }
+            _ => self.add_token(TokenType::InvalidToken)
         }
+    }
+    fn match_next_char(&mut self, c: char) -> bool {
+        if !self.is_full(){
+            return false
+        } else if self.source.chars().nth(self.current).unwrap() != c {
+            return false
+        }
+        self.current+=1;
+        true
     }
     fn add_token(&mut self, token_type: TokenType) {
         let text = self.source[self.start..self.current].to_string();
