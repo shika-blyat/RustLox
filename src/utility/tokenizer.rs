@@ -40,21 +40,45 @@ impl Scanner {
         }
     }
     pub fn scan_tokens(&mut self) {
-        while !self.is_finished() {
+        while self.is_full() {
             self.start = self.current;
             self.scan_token();
         }
-        self.add_token(TokenType::Eof, "");
+        self.add_token(TokenType::Eof);
         println!("{:#?}", self.tokens);
     }
-    fn is_finished(&self) -> bool {
-        self.current <= self.source.len()
+    fn is_full(&self) -> bool {
+        self.current < self.source.len()
     }
-    fn scan_token(&self) {
-        
+    fn scan_token(&mut self) {
+        let c = self.advance();
+        println!("{}", c);
+        match c{
+            '(' => self.add_token(TokenType::RightParen),
+            ')' => self.add_token(TokenType::LeftParen),
+            '{' => self.add_token(TokenType::RightBrace),
+            '}' => self.add_token(TokenType::LeftBrace),
+            '+' => self.add_token(TokenType::Plus),
+            '-' => self.add_token(TokenType::Minus),
+            '*' => self.add_token(TokenType::Star),
+            ';' => self.add_token(TokenType::Semicolon),
+            ',' => self.add_token(TokenType::Comma),
+            '.' => self.add_token(TokenType::Dot),
+            _ => (),
+        }
     }
-    fn add_token(&mut self, token_type: TokenType, lexeme: &str) {
-        self.tokens
-            .push(Token::new(token_type, lexeme.to_string(), self.line));
+    fn add_token(&mut self, token_type: TokenType) {
+        let text = self.source[self.start..self.current].to_string();
+        if let TokenType::Eof = token_type{
+            self.tokens
+                .push(Token::new(token_type, String::new(), self.line));
+        } else {
+            self.tokens
+                .push(Token::new(token_type, text, self.line));
+        }
+    }
+    fn advance(&mut self) -> char {
+        self.current+=1;
+        self.source.chars().nth(self.current-1).unwrap()
     }
 }
