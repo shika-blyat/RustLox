@@ -7,7 +7,7 @@ use std::io::Read;
 use std::io::Write;
 
 pub mod utility;
-use utility::tokenizer::Scanner;
+use utility::lexer::Scanner;
 
 fn main() {
     if let Some(path) = args().nth(1) {
