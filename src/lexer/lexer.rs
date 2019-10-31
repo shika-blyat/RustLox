@@ -22,21 +22,19 @@ impl Token {
     }
 }
 
-pub struct Scanner <'a>{
+pub struct Scanner {
     tokens: Vec<Token>,
     pub source: String,
-    source_iterator: std::str::Chars<'a>,
     start: usize,
     current: usize,
     line: usize,
 }
 
-impl Scanner<'_> {
+impl Scanner {
     pub fn new(source: &str) -> Scanner {
         Scanner {
             tokens: vec![],
             source: source.to_string(),
-            source_iterator: source.chars(),
             start: 0,
             current: 0,
             line: 1,
@@ -182,7 +180,7 @@ impl Scanner<'_> {
     fn match_next_char(&mut self, c: char) -> bool {
         if !self.is_full() {
             return false;
-        } else if self.source_iterator.nth(self.current).unwrap() != c {
+        } else if self.source.chars().nth(self.current).unwrap() != c {
             return false;
         }
         self.current += 1;
@@ -192,13 +190,13 @@ impl Scanner<'_> {
         if !self.is_full() {
             return '\0';
         }
-        self.source_iterator.nth(self.current).unwrap()
+        self.source.chars().nth(self.current).unwrap()
     }
     fn peek_next(&mut self) -> char {
         if self.current + 1 >= self.source.len() {
             return '\0';
         }
-        return self.source_iterator.nth(self.current + 1).unwrap();
+        return self.source.chars().nth(self.current + 1).unwrap();
     }
     fn add_token(&mut self, token_type: TokenType) {
         let text = self.source[self.start..self.current].to_string();
@@ -216,6 +214,6 @@ impl Scanner<'_> {
     }
     fn advance(&mut self) -> char {
         self.current += 1;
-        self.source_iterator.nth(self.current - 1).unwrap()
+        self.source.chars().nth(self.current - 1).unwrap()
     }
 }
