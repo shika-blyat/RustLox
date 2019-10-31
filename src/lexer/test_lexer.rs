@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::utility::lexer::{Scanner, Token};
-    use crate::utility::tokens::TokenType;
+    use crate::lexer::lexer::{Scanner, Token};
+    use crate::lexer::tokens::TokenType;
     #[test]
     fn unit_token() {
         let expected_result = vec![

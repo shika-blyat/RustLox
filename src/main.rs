@@ -6,8 +6,8 @@ use std::io::Error;
 use std::io::Read;
 use std::io::Write;
 
-pub mod utility;
-use utility::lexer::Scanner;
+pub mod lexer;
+use lexer::lexer::Scanner;
 
 fn main() {
     if let Some(path) = args().nth(1) {
