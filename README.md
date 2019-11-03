@@ -3,7 +3,7 @@
 Yet another Rust implementation of the Lox language, from https://www.craftinginterpreters.com/
 
 ### This is a WIP
-- [ ] Tokenizer 
+- [x] Tokenizer
 - [ ] Parser
 - [ ] Evaluation
 - [ ] Statements
