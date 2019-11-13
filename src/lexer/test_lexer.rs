@@ -4,7 +4,7 @@ mod tests {
     use crate::lexer::tokens::TokenType;
     #[test]
     fn unit_token() {
-        let expected_result = vec![
+let expected_result = vec![
             Token::new(TokenType::LeftParen, String::from("("), 1),
             Token::new(TokenType::RightParen, String::from(")"), 1),
             Token::new(TokenType::LeftBrace, String::from("{"), 1),
