@@ -3,6 +3,7 @@ use std::fmt;
 #[derive(Debug, Clone, PartialEq)]
 #[allow(dead_code)]
 
+
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
