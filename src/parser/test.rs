@@ -77,6 +77,6 @@ mod tests {
                 Token::new(TokenType::RightParen, ")".to_owned(), 0),
             )),
         ));
-        println!("{}", expr.pretty_print());
+        asssert_eq!("(* (( 45.67) ) (- 123))", expr.pretty_print());
     }
 }
