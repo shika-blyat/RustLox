@@ -1,4 +1,4 @@
-use crate::lexer::tokens::TokenType;
+use crate::parser::tokens::TokenType;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
@@ -15,10 +15,11 @@ impl Token {
             line,
         }
     }
-    pub fn as_string(&self) {
-        self.token_type
-            .to_string()
-            .push_str(&(" ".to_owned() + &self.lexeme + " "));
+    pub fn as_string(&self) -> String {
+        self.lexeme.clone()
+    }
+    pub fn as_type(&self) -> TokenType {
+        self.token_type.clone()
     }
 }
 

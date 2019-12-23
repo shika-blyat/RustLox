@@ -1,3 +1,4 @@
+pub mod grammar;
 pub mod lexer;
-pub mod test_lexer;
+pub mod test;
 pub mod tokens;

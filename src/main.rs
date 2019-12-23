@@ -6,15 +6,39 @@ use std::io::Error;
 use std::io::Read;
 use std::io::Write;
 
-pub mod lexer;
-use lexer::lexer::Scanner;
+pub mod parser;
+use crate::parser::grammar::PrettyPrint;
+use crate::parser::grammar::{Binary, Expr, Grouping, Literal, Operator, Unary};
+use crate::parser::lexer::{Scanner, Token};
+use crate::parser::tokens::TokenType;
 
 fn main() {
-    if let Some(path) = args().nth(1) {
+    /*if let Some(path) = args().nth(1) {
         let file = open_file(&path).unwrap();
         execute_source(&file.trim());
     }
-    run_interpreter();
+    run_interpreter();*/
+    let expr = Expr::Binary(Binary::new(
+        Expr::Unary(Unary::new(
+            Token::new(TokenType::Minus, "-".to_owned(), 0),
+            Expr::Literal(Literal::new(Token::new(
+                TokenType::Number(123.0),
+                "123".to_owned(),
+                0,
+            ))),
+        )),
+        Operator::new(Token::new(TokenType::Star, "*".to_owned(), 0)),
+        Expr::Grouping(Grouping::new(
+            Token::new(TokenType::LeftParen, "(".to_owned(), 0),
+            Expr::Literal(Literal::new(Token::new(
+                TokenType::Number(45.67),
+                "45.67".to_owned(),
+                0,
+            ))),
+            Token::new(TokenType::RightParen, ")".to_owned(), 0),
+        )),
+    ));
+    println!("{}", expr.pretty_print());
 }
 
 fn run_interpreter() {
