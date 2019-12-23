@@ -179,7 +179,7 @@ impl Scanner {
         self.add_token(TokenType::String(value));
     }
     fn match_next_char(&mut self, c: char) -> bool {
-        if !self.is_full() && self.source.chars().nth(self.current).unwrap() != c {
+        if !self.is_full() || self.source.chars().nth(self.current).unwrap() != c {
             return false;
         }
         self.current += 1;
