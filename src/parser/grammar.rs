@@ -10,6 +10,45 @@ pub enum Expr {
     Operator(Operator),
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum Primary {
+    Token(Literal),
+    Grouped(Grouping),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Simple {
+    Primary(Primary),
+    Unary(Unary),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Unary {
+    operator: Token,
+    unary: Box<Simple>,
+}
+impl Unary {
+    pub fn new(operator: Token, unary: Simple) -> Self {
+        let unary = Box::new(unary);
+        match operator.as_type() {
+            TokenType::Bang | TokenType::Minus => Self { operator, unary },
+            _ => panic!(
+                "Unary cannot be built with {} as the operator",
+                operator.as_type()
+            ),
+        }
+    }
+}
+
+impl PrettyPrint for Unary {
+    fn pretty_print(&self) -> String {
+        parenthesize(
+            self.operator.as_string(),
+            Some(vec![self.expr_right.clone()]),
+        )
+    }
+}
+
 pub trait PrettyPrint {
     fn pretty_print(&self) -> String;
 }
@@ -87,38 +126,6 @@ impl Grouping {
 impl PrettyPrint for Grouping {
     fn pretty_print(&self) -> String {
         parenthesize("(".to_owned(), Some(vec![*(self.expr.clone())])) + " )"
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct Unary {
-    operator: Token,
-    expr_right: Box<Expr>,
-}
-impl Unary {
-    pub fn new(operator: Token, expr_right: Expr) -> Self {
-        match operator.as_type() {
-            TokenType::Bang | TokenType::Minus => {
-                let expr_right = Box::new(expr_right);
-                Self {
-                    operator,
-                    expr_right,
-                }
-            }
-            _ => panic!(
-                "Unary cannot be built with {} as the operator",
-                operator.as_type()
-            ),
-        }
-    }
-}
-
-impl PrettyPrint for Unary {
-    fn pretty_print(&self) -> String {
-        parenthesize(
-            self.operator.as_string(),
-            Some(vec![*(self.expr_right.clone())]),
-        )
     }
 }
 
