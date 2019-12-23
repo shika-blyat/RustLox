@@ -18,6 +18,9 @@ impl Token {
     pub fn as_string(&self) -> String {
         self.lexeme.clone()
     }
+    pub fn as_token_name(&self) -> String {
+        self.token_type.to_string()
+    }
     pub fn as_type(&self) -> TokenType {
         self.token_type.clone()
     }
@@ -47,7 +50,13 @@ impl Scanner {
             self.scan_token();
         }
         self.add_token(TokenType::Eof);
-        println!("{:?}", self.tokens);
+        println!(
+            "{:?}",
+            self.tokens
+                .iter()
+                .map(|x| x.as_token_name() + " ")
+                .collect::<String>()
+        );
         self.tokens.clone()
     }
     fn is_full(&self) -> bool {
