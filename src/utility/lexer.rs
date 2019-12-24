@@ -13,6 +13,9 @@ impl Token {
     pub fn as_type(&self) -> TokenType {
         self.token_type.clone()
     }
+    pub fn as_string(&self) -> String {
+        self.lexeme.clone()
+    }
     pub fn read_errors(tokens: Vec<Token>) -> Option<Vec<String>> {
         let mut errors = vec![];
         for i in tokens {
@@ -56,6 +59,7 @@ impl Lexer {
             }
             return errors;
         }
+        self.add_token(TokenType::Eof, "");
         self.result.clone()
     }
     fn is_empty(&self) -> bool {
@@ -97,12 +101,20 @@ impl Lexer {
             }
             if is_float {
                 self.add_token(
-                    TokenType::Float(number.parse().expect("Internal Runtime Error")),
+                    TokenType::Float(
+                        number
+                            .parse()
+                            .expect("Internal Runtime Error during float parsing"),
+                    ),
                     number.clone().as_str(),
                 )
             } else {
                 self.add_token(
-                    TokenType::Int(number.parse().expect("Internal Runtime Error")),
+                    TokenType::Int(
+                        number
+                            .parse()
+                            .expect("Internal Runtime Error during int parsing"),
+                    ),
                     number.clone().as_str(),
                 )
             }
@@ -143,6 +155,8 @@ impl Lexer {
             '+' => self.add_token(TokenType::Plus, "+"),
             '-' => self.add_token(TokenType::Minus, "-"),
             '/' => self.add_token(TokenType::Slash, "/"),
+            't' => self.add_token(TokenType::True, "t"),
+            'f' => self.add_token(TokenType::False, "f"),
             _ => (),
         }
     }

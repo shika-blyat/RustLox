@@ -1,10 +1,11 @@
 mod utility;
 
+use utility::ast::Parser;
 use utility::lexer::{Lexer, Token};
 use utility::tokens::TokenType;
 
 fn main() {
-    let code = "= == ! != 15 15.2";
+    let code = "( 2 + 5 )";
     let mut lexer = Lexer::new(code);
     let tokens = lexer.tokenize();
     if let TokenType::Error(_) = tokens[0].as_type() {
@@ -13,6 +14,9 @@ fn main() {
         }
     } else {
         println!("{:#?}", tokens);
+        let mut parser = Parser::new(tokens);
+        let ast = parser.parse();
+        println!("{:#?}", ast);
     }
 }
 

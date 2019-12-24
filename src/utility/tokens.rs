@@ -17,4 +17,7 @@ pub enum TokenType {
     Error(String),
     LeftParen,
     RightParen,
+    True,
+    False,
+    Eof,
 }
