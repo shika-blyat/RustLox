@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 
+mod ast;
 mod errors;
 mod lexer;
+mod parser;
 mod tokens;
 mod utils;
 
