@@ -1,3 +1,5 @@
+// Todo: Refactor Ranged pos to make the range field accepting any kind of range
+
 use std::ops::RangeInclusive;
 
 pub fn get_line(n: usize, s: &str) -> Option<&str> {
