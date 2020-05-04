@@ -37,3 +37,7 @@ impl Default for Pos {
         Self { line: 1, char_: 1 }
     }
 }
+
+pub fn box_<T>(val: T) -> Box<T> {
+    Box::new(val)
+}

@@ -4,6 +4,7 @@ mod ast;
 mod errors;
 mod lexer;
 mod parser;
+mod tests;
 mod tokens;
 mod utils;
 
