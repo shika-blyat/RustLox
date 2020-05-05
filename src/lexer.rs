@@ -2,7 +2,7 @@ use std::{iter::Peekable, ops::RangeInclusive, str::Chars};
 
 use crate::{
     errors::{LexError, LexErrorKind},
-    tokens::{Token, TokenKind},
+    tokens::{Token, TokenKind, TokensIterator},
     utils::Pos,
 };
 
@@ -25,7 +25,7 @@ impl<'a> Lexer<'a> {
             tokens: vec![],
         }
     }
-    pub fn tokenize(mut self) -> LexResult<'a, Vec<Token<'a>>> {
+    pub fn tokenize(mut self) -> LexResult<'a, TokensIterator<'a>> {
         while let Some(c) = self.next() {
             if c.is_ascii_digit() {
                 self.num();
@@ -47,7 +47,7 @@ impl<'a> Lexer<'a> {
                 '/' => self.token(TokenKind::Div, self.stream_pos..=self.stream_pos),
                 ':' => self.token(TokenKind::Colon, self.stream_pos..=self.stream_pos),
                 ';' => self.token(TokenKind::Semicolon, self.stream_pos..=self.stream_pos),
-                ',' => self.token(TokenKind::Semicolon, self.stream_pos..=self.stream_pos),
+                ',' => self.token(TokenKind::Comma, self.stream_pos..=self.stream_pos),
                 '!' => {
                     if let Some('=') = self.peek() {
                         self.next();
@@ -74,7 +74,7 @@ impl<'a> Lexer<'a> {
                 }
             }
         }
-        Ok(self.tokens)
+        Ok(TokensIterator::new(self.tokens))
     }
     fn num(&mut self) {
         let start = self.stream_pos - 1;

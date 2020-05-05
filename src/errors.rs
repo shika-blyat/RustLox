@@ -45,17 +45,3 @@ impl<'a> fmt::Display for LexError<'a> {
         )
     }
 }
-
-/*
-    let code = "fn main(){
-        printChar('a);
-    }";
-    let pos = RangedPos {
-        line: 2,
-        char_: 18,
-        range: 0..=3,
-    };
-    let file = "main.ka";
-    let err = LexError::UnclosedDelimiter('\'');
-    println!("{}", err.format_err(file, code, pos));
-*/
