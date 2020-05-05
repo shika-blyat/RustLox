@@ -1,5 +1,9 @@
-use crate::utils::{get_line, RangedPos};
+use crate::{
+    tokens::TokenKind,
+    utils::{get_line, RangedPos},
+};
 use std::fmt;
+
 fn format_err(file: &str, code: &str, pos: RangedPos, err_kind: &impl fmt::Display) -> String {
     let mut arrows = " ".repeat(pos.char_ - 1);
     arrows.push_str("^".repeat(pos.range.count()).as_str());
@@ -43,5 +47,20 @@ impl<'a> fmt::Display for LexError<'a> {
             "{}",
             format_err("main.ka", self.code, self.pos.clone(), &self.kind)
         )
+    }
+}
+
+pub enum ParseErrorKind<'a> {
+    ExpectedFound(String, TokenKind<'a>),
+}
+pub struct ParseError<'a> {
+    pub kind: ParseErrorKind<'a>,
+    pub code: &'a str,
+    pub pos: RangedPos,
+}
+
+impl<'a> ParseError<'a> {
+    pub fn new(kind: ParseErrorKind<'a>, pos: RangedPos, code: &'a str) -> Self {
+        Self { kind, pos, code }
     }
 }

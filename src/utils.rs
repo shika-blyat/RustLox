@@ -11,6 +11,11 @@ pub struct RangedPos {
     pub char_: usize,
     pub range: RangeInclusive<usize>,
 }
+impl RangedPos {
+    pub fn range(self, range: RangeInclusive<usize>) -> Self {
+        Self { range, ..self }
+    }
+}
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Pos {
     pub line: usize,
